@@ -29,6 +29,15 @@ GameController::GameController(QObject *parent) : QObject(parent) {
  * plugged in
  */
 void GameController::findNewController() {
+  ros::master::V_TopicInfo master_topics;
+  ros::master::getTopics(master_topics);
+
+  for (ros::master::V_TopicInfo::iterator it = master_topics.begin() ; it != master_topics.end(); it++) {
+    const ros::master::TopicInfo& info = *it;
+    if (info.name == "/joy") {
+      rosGamepad = true;
+    }
+  }
   delete _qGamepad;
   _qGamepad = nullptr;  // in case this doesn't work!
 
@@ -59,25 +68,41 @@ void GameController::findNewController() {
  * TODO: what happens if the joystick is unplugged?
  */
 void GameController::updateGamepadCommand(GamepadCommand &gamepadCommand) {
-  if (_qGamepad) {
-    gamepadCommand.leftBumper = _qGamepad->buttonL1();
-    gamepadCommand.rightBumper = _qGamepad->buttonR1();
-    gamepadCommand.leftTriggerButton = _qGamepad->buttonL2() != 0.;
-    gamepadCommand.rightTriggerButton = _qGamepad->buttonR2() != 0.;
-    gamepadCommand.back = _qGamepad->buttonSelect();
-    gamepadCommand.start = _qGamepad->buttonStart();
-    gamepadCommand.a = _qGamepad->buttonA();
-    gamepadCommand.b = _qGamepad->buttonB();
-    gamepadCommand.x = _qGamepad->buttonX();
-    gamepadCommand.y = _qGamepad->buttonY();
-    gamepadCommand.leftStickButton = _qGamepad->buttonL3();
-    gamepadCommand.rightStickButton = _qGamepad->buttonR3();
-    gamepadCommand.leftTriggerAnalog = (float)_qGamepad->buttonL2();
-    gamepadCommand.rightTriggerAnalog = (float)_qGamepad->buttonR2();
-    gamepadCommand.leftStickAnalog =
-        Vec2<float>(_qGamepad->axisLeftX(), -_qGamepad->axisLeftY());
-    gamepadCommand.rightStickAnalog =
-        Vec2<float>(_qGamepad->axisRightX(), -_qGamepad->axisRightY());
+  // if (_qGamepad) {
+  //   gamepadCommand.leftBumper = _qGamepad->buttonL1();
+  //   gamepadCommand.rightBumper = _qGamepad->buttonR1();
+  //   gamepadCommand.leftTriggerButton = _qGamepad->buttonL2() != 0.;
+  //   gamepadCommand.rightTriggerButton = _qGamepad->buttonR2() != 0.;
+  //   gamepadCommand.back = _qGamepad->buttonSelect();
+  //   gamepadCommand.start = _qGamepad->buttonStart();
+  //   gamepadCommand.a = _qGamepad->buttonA();
+  //   gamepadCommand.b = _qGamepad->buttonB();
+  //   gamepadCommand.x = _qGamepad->buttonX();
+  //   gamepadCommand.y = _qGamepad->buttonY();
+  //   gamepadCommand.leftStickButton = _qGamepad->buttonL3();
+  //   gamepadCommand.rightStickButton = _qGamepad->buttonR3();
+  //   gamepadCommand.leftTriggerAnalog = (float)_qGamepad->buttonL2();
+  //   gamepadCommand.rightTriggerAnalog = (float)_qGamepad->buttonR2();
+  //   gamepadCommand.leftStickAnalog =
+  //       Vec2<float>(_qGamepad->axisLeftX(), -_qGamepad->axisLeftY());
+  //   gamepadCommand.rightStickAnalog =
+  //       Vec2<float>(_qGamepad->axisRightX(), -_qGamepad->axisRightY());
+  // }
+  if (rosGamepad) {
+    gamepadCommand.leftBumper = gamepadData.buttons[7];
+    gamepadCommand.rightBumper = gamepadData.buttons[5];
+    gamepadCommand.leftTriggerButton = gamepadData.buttons[8];
+    gamepadCommand.rightTriggerButton = gamepadData.buttons[6];
+    gamepadCommand.back = gamepadData.buttons[12];
+    gamepadCommand.start = gamepadData.buttons[13];
+    gamepadCommand.a = gamepadData.buttons[0];
+    gamepadCommand.b = gamepadData.buttons[1];
+    gamepadCommand.x = gamepadData.buttons[2];
+    gamepadCommand.y = gamepadData.buttons[3];
+    gamepadCommand.leftStickButton = gamepadData.buttons[10];
+    gamepadCommand.rightStickButton = gamepadData.buttons[9];
+    gamepadCommand.leftStickAnalog = Vec2<float>(-gamepadData.axes[0], gamepadData.axes[1]);
+    gamepadCommand.rightStickAnalog = Vec2<float>(-gamepadData.axes[3], -gamepadData.axes[4]);
   } else {
     gamepadCommand.zero();  // no joystick, return all zeros
   }

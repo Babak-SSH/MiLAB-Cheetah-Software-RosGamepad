@@ -11,6 +11,9 @@
 
 #include <QtCore/QObject>
 
+#include <ros/ros.h>
+#include <sensor_msgs/Joy.h>
+
 class QGamepad;  // for an unknown reason, #including <QtGamepad/QGamepad> here
                  // makes compilation *very* slow
 
@@ -24,6 +27,8 @@ class GameController : public QObject {
 
  private:
   QGamepad *_qGamepad = nullptr;
+  bool rosGamepad = false;
 };
 
+extern sensor_msgs::Joy gamepadData;
 #endif  // PROJECT_GAMECONTROLLER_H
