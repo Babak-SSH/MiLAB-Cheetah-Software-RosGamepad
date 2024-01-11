@@ -22,12 +22,19 @@ set(CMAKE_AUTOUIC ON)
 set(Qt5Core_DIR ~/Qt5.10.0/5.10.0/gcc_64/lib/cmake/Qt5Core)
 set(Qt5Widgets_DIR ~/Qt5.10.0/5.10.0/gcc_64/lib/cmake/Qt5Widgets)
 set(Qt5Gamepad_DIR ~/Qt5.10.0/5.10.0/gcc_64/lib/cmake/Qt5Gamepad)
+set(roscpp_DIR /opt/ros/melodic/share/roscpp/cmake)
+set(std_msgs_DIR /opt/ros/melodic/share/sensor_msgs/cmake)
 #endadd
 find_package(Qt5Core CONFIG REQUIRED)
 find_package(Qt5Widgets CONFIG REQUIRED)
 get_target_property(QtCore_location Qt5::Core LOCATION)
 message(STATUS ${QtCore_location})
 find_package(Qt5Gui CONFIG REQUIRED)
+find_package(roscpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+
+include_directories(${roscpp_INCLUDE_DIRS})
+include_directories(${sensor_msgs_INCLUDE_DIRS})
 
 set(QOBJECT_HEADERS
         include/Graphics3D.h
@@ -58,7 +65,8 @@ include_directories(${OPENGL_INCLUDE_DIR})
 
 add_executable(sim ${sources} ${tst_hdr_moc})
 target_link_libraries(sim biomimetics pthread lcm inih dynacore_param_handler 
-    Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Gamepad ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+    Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Gamepad ${QT_LIBRARIES} ${OPENGL_LIBRARIES}
+    ${roscpp_LIBRARIES} ${sensor_msgs_LIBRARIES})
 
 if (CMAKE_SYSTEM_NAME MATCHES Linux)
   target_link_libraries(sim rt ${GLUT_glut_LIBRARIES})
