@@ -25,5 +25,5 @@ kdBase: [20,10,10]
 ## or YOU MAY MEET SEGMENT FAULT (CORE DUMP)! --WYN
 cheater_mode      : 0
 #cheater_mode      : 1
-use_rc: 1
-#use_rc: 0
+# use_rc: 1
+use_rc: 0
